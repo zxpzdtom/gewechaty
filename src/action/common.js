@@ -183,7 +183,7 @@ export const say = async (content, toWxid, ats) => {
   }
 }
 // 引用
-export const quote = async (obj, toWxid) => {
+export const quote = async (obj) => {
   const msg = `<appmsg appid="" sdkver="0">
     <title>${obj.title}</title>
     <des />
@@ -227,7 +227,7 @@ export const quote = async (obj, toWxid) => {
   </appmsg>`.replace(/>\s+</g, '><') // 移除多余的空白字符
   return SendAppMsg({
     appId: getAppId(),
-    toWxid,
+    toWxid: obj.roomid || obj.wxid,
     appmsg: msg,
   })
 }
