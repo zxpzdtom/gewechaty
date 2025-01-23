@@ -8,7 +8,9 @@
     "dev": "npm run build && npm run test",
     "build": "webpack --config ./webpack.config.js",
     "check-types": "tsc index.d.ts --noEmit",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "version": "npm run build",
+    "postversion": "npm publish --tag beta && git push && git push --tags"
   },
   "author": "MIKO",
   "license": "ISC",
