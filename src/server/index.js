@@ -183,7 +183,8 @@ export const startServe = (option) => {
         app.use(router.allowedMethods())
 
         const res = await setUrl(callBackUrl)
-        if (res.token) {
+        console.log('setUrl res', res)
+        if (res) {
           console.log(`设置回调地址为：${callBackUrl}`)
           console.log('服务启动成功')
           resolve({ app, router })
