@@ -213,6 +213,7 @@ declare module '@zxpzdtom/gewechaty'
       to(): Promise<Contact>;
       room(): Promise<Room | false>;
       text(): string;
+      say(textOrContactOrFileOrUrl: string, ats?: string | Contact[]): Promise<ResponseMsg>;
       say(textOrContactOrFileOrUrl: string | Contact | Filebox | UrlLink | MiniApp | AppMsg | Voice | WeVideo | Emoji): Promise<ResponseMsg>;
       type(): number;
       self(): boolean;
