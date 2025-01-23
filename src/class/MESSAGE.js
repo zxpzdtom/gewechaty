@@ -177,7 +177,7 @@ export class Message {
       signature
     }
 
-    return quote(msg, this.fromId)
+    return quote(msg)
   }
   // 获取xml转json
   static getXmlToJson(xml) {
