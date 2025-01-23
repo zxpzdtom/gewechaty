@@ -1,6 +1,6 @@
 {
   "name": "@zxpzdtom/gewechaty",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "dist/index.js",
   "types": "index.d.ts",
   "scripts": {
@@ -44,12 +44,20 @@
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4"
   },
-  "files": ["dist/", "index.d.ts"],
+  "files": [
+    "dist/",
+    "index.d.ts"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/mikoshu/gewechaty.git"
   },
-  "keywords": ["wechaty", "wechatBot", "wechat", "gewechat"],
+  "keywords": [
+    "wechaty",
+    "wechatBot",
+    "wechat",
+    "gewechat"
+  ],
   "bugs": {
     "url": "https://github.com/mikoshu/gewechaty/issues"
   },
