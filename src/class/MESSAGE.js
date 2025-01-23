@@ -16,20 +16,20 @@ export class Message {
   constructor(data) {
     // 从 JSON 数据结构中提取所需信息
     this.wxid = data.Wxid;
-    
-    if(data.Data.FromUserName.string.includes('@chatroom')){ // 新版本微信
+
+    if (data.Data.FromUserName.string.includes('@chatroom')) { // 新版本微信
       this.isRoom = true;
       this.roomId = data.Data.FromUserName.string;
       this.fromId = data.Data.Content.string.split(':\n')[0];
       this.toId = this.roomId;
       this._text = data.Data.Content.string.split(':\n').slice(1).join(':\n') || '';
-    }else if (data.Data.ToUserName.string.includes('@chatroom')){ // 旧版本微信
+    } else if (data.Data.ToUserName.string.includes('@chatroom')) { // 旧版本微信
       this.isRoom = true;
       this.roomId = data.Data.ToUserName.string;
       this.fromId = data.Data.FromUserName.string;
       this.toId = this.roomId;
       this._text = data.Data.Content.string || '';
-    }else{
+    } else {
       this.isRoom = false;
       this.fromId = data.Data.FromUserName.string;
       this.toId = data.Data.ToUserName.string;
@@ -52,24 +52,24 @@ export class Message {
   }
 
   // 实例方法
-  isCompanyMsg () { // 是否是企业微信消息
+  isCompanyMsg() { // 是否是企业微信消息
     const companyList = ['weixin', 'newsapp', 'tmessage', 'qqmail', 'mphelper', 'qqsafe', 'weibo', 'qmessage', 'floatbottle', 'medianote']
     return this.fromId.includes('gh_') || companyList.includes(this.fromId)
   }
   //发送者
-  from () {
+  from() {
     return getContact(this.fromId);
   }
   //发送者
-  talker () {
+  talker() {
     return getContact(this.fromId);
   }
   //接收者
-  to () {
+  to() {
     return getContact(this.toId);
   }
   // 是否是群聊消息 是则返回群信息
-  async room () {
+  async room() {
     if (!this.isRoom) return false;
     if (!this._roomInfo) {
       this._roomInfo = await getRoomInfo(this.roomId);
@@ -77,30 +77,30 @@ export class Message {
     return this._roomInfo;
   }
   // 消息内容
-  text () {
+  text() {
     return this._text;
   }
   // 发送消息
-  async say (textOrContactOrFileOrUrl) {
-    const res = await say(textOrContactOrFileOrUrl, this.isRoom ? this.roomId : this.fromId)
+  async say(textOrContactOrFileOrUrl, ats) {
+    const res = await say(textOrContactOrFileOrUrl, this.isRoom ? this.roomId : this.fromId, ats)
     return new ResponseMsg(res)
   }
   // 消息类型
-  type () {
+  type() {
     return Message.getType(this._type, this.text())
   }
   // 是否是自己发的消息
-  self () {
+  self() {
     return this._self;
   }
   // 获取@的联系人 ..todo
-  async mention () {
+  async mention() {
     // 根据消息内容模拟提到的联系人
     console.log('暂不支持')
     return null;
   }
   // 是否被@了
-  async mentionSelf () {
+  async mentionSelf() {
     if (!this.isRoom || !this._msgSource) {
       return false;
     }
@@ -109,7 +109,7 @@ export class Message {
     return atUserList?.split(',').includes(this.wxid);
   }
   // 消息转发
-  async forward (to) {
+  async forward(to) {
     if (!to) {
       console.error('转发消息时，接收者不能为空')
       return
@@ -117,26 +117,26 @@ export class Message {
     return forward(this.text(), to, this.type())
   }
 
-  date () {
+  date() {
     return new Date(this._date);
   }
 
-  age () {
+  age() {
     const now = Date.now();
     return Math.floor((now - this._date) / 1000); // 以秒为单位计算消息的年龄
   }
   // 获取名片 。。。todo
-  async toContact () {
+  async toContact() {
     console.log('暂不支持');
     return null;
   }
   // 获取链接。。。todo
-  async toUrlLink () {
+  async toUrlLink() {
     console.log('暂不支持')
     return null;
   }
   // 获取图片。。。todo
-  async toFileBox (type = 2) {
+  async toFileBox(type = 2) {
     if (this._type !== 3) {
       console.log('不是图片类型，无法调用toFileBox方法');
       return null;
@@ -152,7 +152,7 @@ export class Message {
     }
   }
   // 引用消息
-  async quote (title) {
+  async quote(title) {
     if (!title || title === '') {
       console.error('引用消息时title不能为空')
       return
@@ -167,7 +167,7 @@ export class Message {
     return quote(msg, this.fromId)
   }
   // 获取xml转json
-  static getXmlToJson (xml) {
+  static getXmlToJson(xml) {
     const parser = new XMLParser({
       ignoreAttributes: false, // 不忽略属性
       attributeNamePrefix: '', // 移除默认的属性前缀
@@ -176,43 +176,35 @@ export class Message {
     return jObj
   }
   // 静态方法
-  static async find (query) {
+  static async find(query) {
     return await find(query)
   }
 
-  static async findAll (queryArgs) {
+  static async findAll(queryArgs) {
     console.log('暂不支持findAll')
     return Promise.resolve([])
   }
 
-  static getType (type, xml) {
+  static getType(type, xml) {
     let jObj
     try {
       switch (type) {
         case 1:
           return MessageType.Text;
-          break;
         case 3:
           return MessageType.Image;
-          break;
         case 34:
           return MessageType.Voice;
-          break;
         case 37:
           return MessageType.AddFriend;
-          break;
         case 42:
           return MessageType.Contact;
-          break;
         case 43:
           return MessageType.Video;
-          break;
         case 47:
           return MessageType.Emoji;
-          break;
         case 48:
           return MessageType.Location
-          break;
         case 49:
           jObj = Message.getXmlToJson(xml);
           // console.log(jObj)
@@ -282,7 +274,7 @@ export class Message {
       return MessageType.Unknown
     }
   }
-  static revoke (obj) {
+  static revoke(obj) {
     return revoke(obj)
   }
 }
@@ -291,7 +283,7 @@ export class ResponseMsg {
   constructor(obj) {
     Object.assign(this, obj);
   }
-  revoke () {
+  revoke() {
     return revoke(this)
   }
 }
