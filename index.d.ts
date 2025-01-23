@@ -225,7 +225,7 @@ declare module '@zxpzdtom/gewechaty' {
     toContact(): Promise<null>; // TODO as noted in the code
     toUrlLink(): Promise<null>; // TODO as noted in the code
     toFileBox(type?: number): Promise<Filebox | null>;
-    quote(title: string): Promise<void>;
+    quote(title: string): Promise<ResponseMsg>;
 
     // Static methods
     static getXmlToJson(xml: string): any;

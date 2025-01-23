@@ -179,7 +179,8 @@ export class Message {
       signature,
     };
 
-    return quote(msg);
+    const res = quote(msg);
+    return new ResponseMsg(res);
   }
   // 获取xml转json
   static getXmlToJson(xml) {
