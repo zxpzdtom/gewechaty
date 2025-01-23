@@ -19,5 +19,4 @@ export class WeVideo {
     this.thumbUrl = obj.thumbUrl;
     this.videoDuration = obj.videoDuration;
   }
-
 }

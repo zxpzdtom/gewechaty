@@ -13,5 +13,4 @@ export class UrlLink {
     this.linkUrl = obj.linkUrl;
     this.thumbUrl = obj.thumbUrl;
   }
-
 }

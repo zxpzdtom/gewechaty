@@ -14,5 +14,4 @@ export class Voice {
     this.voiceUrl = obj.voiceUrl;
     this.voiceDuration = obj.voiceDuration;
   }
-
 }

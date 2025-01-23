@@ -1,49 +1,48 @@
 import DS from 'ds';
 
-let ds = new DS()
+const ds = new DS();
 
 export const getToken = () => {
-  return ds.token || ''
-}
+  return ds.token || '';
+};
 
 export const setToken = (token) => {
-  ds.token = token
-  ds.save()
-}
+  ds.token = token;
+  ds.save();
+};
 
 export const getAppId = () => {
-  return ds.appid || ''
-}
+  return ds.appid || '';
+};
 
 export const setAppId = (appid) => {
-  ds.appid = appid
-  ds.save()
-}
+  ds.appid = appid;
+  ds.save();
+};
 
 export const getUuid = () => {
-  return ds.uuid || ''
-}
+  return ds.uuid || '';
+};
 
 export const setUuid = (uuid) => {
-  ds.uuid = uuid
-  ds.save()
-}
-
+  ds.uuid = uuid;
+  ds.save();
+};
 
 export const setBaseUrl = (baseUrl) => {
-  ds.baseUrl = baseUrl
-  ds.save()
-}
+  ds.baseUrl = baseUrl;
+  ds.save();
+};
 
 export const getBaseUrl = () => {
-  return ds.baseUrl || ''
-}
+  return ds.baseUrl || '';
+};
 
 export const setFileApiUrl = (fileBaseUrl) => {
-  ds.fileApiBaseUrl = fileBaseUrl
-  ds.save()
-}
+  ds.fileApiBaseUrl = fileBaseUrl;
+  ds.save();
+};
 
 export const getFileApiUrl = () => {
-  return ds.fileApiBaseUrl || ''
-}
+  return ds.fileApiBaseUrl || '';
+};

@@ -1,6 +1,6 @@
+import fs from 'node:fs';
+import { getRoomMemberList } from '@/action/room.js';
 import Database from 'better-sqlite3';
-import fs from 'fs';
-import {getRoomMemberList} from '@/action/room.js'
 
 class myDB {
   constructor() {
@@ -81,7 +81,7 @@ class myDB {
     } else {
       // 检查是否存在 memberList 字段，如果不存在则添加
       const columns = this.db.prepare(`PRAGMA table_info(${tableName})`).all();
-      const columnNames = columns.map(column => column.name);
+      const columnNames = columns.map((column) => column.name);
       if (!columnNames.includes('memberList')) {
         console.log(`Adding memberList column to ${tableName} table...`);
         this.db.exec(`ALTER TABLE ${tableName} ADD COLUMN memberList TEXT`);
@@ -125,7 +125,7 @@ class myDB {
   findOneByChatroomId(chatroomId) {
     const stmt = this.db.prepare('SELECT * FROM room WHERE chatroomId = ?');
     const row = stmt.get(chatroomId);
-    if (row && row.memberList) {
+    if (row?.memberList) {
       row.memberList = JSON.parse(row.memberList); // 将 memberList 转换为 JSON 格式
     }
     return row ? row : null;
@@ -166,10 +166,10 @@ class myDB {
     if (contact.userName === null) {
       return;
     }
-  
+
     // 定义字段的最大长度
     const MAX_LENGTH = 255;
-  
+
     // 用一个函数来截断字符串
     const truncate = (value, maxLength = MAX_LENGTH) => {
       if (typeof value === 'string' && value.length > maxLength) {
@@ -177,7 +177,7 @@ class myDB {
       }
       return value;
     };
-  
+
     const insertStmt = this.db.prepare(`
       INSERT OR REPLACE INTO contact (
         userName, nickName, pyInitial, quanPin, sex, remark, remarkPyInitial,
@@ -185,7 +185,7 @@ class myDB {
         smallHeadImgUrl, description, cardImgUrl, labelList, province, city, phoneNumList
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-  
+
     insertStmt.run(
       truncate(contact.userName) || null,
       truncate(contact.nickName) || null,
@@ -206,16 +206,16 @@ class myDB {
       truncate(contact.labelList) || null,
       truncate(contact.province) || null,
       truncate(contact.city) || null,
-      truncate(contact.phoneNumList) || null
+      truncate(contact.phoneNumList) || null,
     );
-  
+
     console.log(`缓存联系人: ${contact.userName}`);
   }
 
   // 方法4：插入新的房间数据，如果存在则更新
   insertRoom(room) {
-    if(room.chatroomId === null){
-      return
+    if (room.chatroomId === null) {
+      return;
     }
     const insertStmt = this.db.prepare(`
       INSERT OR REPLACE INTO room (
@@ -236,7 +236,7 @@ class myDB {
       room.chatRoomNotify || null,
       room.chatRoomOwner || null,
       room.smallHeadImgUrl || null,
-      room.memberList ? JSON.stringify(room.memberList) : null
+      room.memberList ? JSON.stringify(room.memberList) : null,
     );
 
     console.log(`缓存群: ${room.chatroomId}`);
@@ -277,7 +277,7 @@ class myDB {
       newData.province || existingContact.province,
       newData.city || existingContact.city,
       newData.phoneNumList || existingContact.phoneNumList,
-      userName
+      userName,
     );
 
     console.log(`Updated contact: ${userName}`);
@@ -297,10 +297,10 @@ class myDB {
         remarkQuanPin = ?, chatRoomNotify = ?, chatRoomOwner = ?, smallHeadImgUrl = ?, memberList = ?
       WHERE chatroomId = ?
     `);
-    
-    const res = await getRoomMemberList(chatroomId) // 更新memberlist
-    if(res && res.memberList){
-      newData.memberList = res.memberList
+
+    const res = await getRoomMemberList(chatroomId); // 更新memberlist
+    if (res?.memberList) {
+      newData.memberList = res.memberList;
     }
     updateStmt.run(
       newData.nickName || existingRoom.nickName,
@@ -314,7 +314,7 @@ class myDB {
       newData.chatRoomOwner || existingRoom.chatRoomOwner,
       newData.smallHeadImgUrl || existingRoom.smallHeadImgUrl,
       newData.memberList ? JSON.stringify(newData.memberList) : existingRoom.memberList, // 转换为 JSON 字符串
-      chatroomId
+      chatroomId,
     );
 
     console.log(`Updated room: ${chatroomId}`);
@@ -330,7 +330,7 @@ class myDB {
   findAllRooms() {
     const stmt = this.db.prepare('SELECT * FROM room');
     const rows = stmt.all();
-    return rows.map(row => {
+    return rows.map((row) => {
       if (row.memberList) {
         row.memberList = JSON.parse(row.memberList); // 将 memberList 转换为 JSON 格式
       }

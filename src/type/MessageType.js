@@ -1,4 +1,4 @@
-import { Voice } from "@/class/VOICE";
+import { Voice } from '@/class/VOICE';
 
 export const MessageType = {
   Unknown: 'unknown', // 未知类型
@@ -12,7 +12,7 @@ export const MessageType = {
   Video: 'video', // 视频
   Url: 'link', // 链接
   RoomInvitation: 'room_invitation', // 群邀请
-  MiniApp:'mini_app', // 小程序消息
+  MiniApp: 'mini_app', // 小程序消息
   AppMsg: 'app_msg', // app消息
   Link: 'link', // 公众号链接
   AddFriend: 'add_friend', // 添加好友通知
@@ -21,7 +21,7 @@ export const MessageType = {
   RedPacket: 'red_packet', //红包
   VideoAccount: 'video_account', // 视频号消息
   Revoke: 'revoke', // 撤回消息
-  Pat:'pat', // 拍一拍
+  Pat: 'pat', // 拍一拍
   Location: 'location', // 位置消息
   FunctionMsg: 'function_msg', // 微信团队消息
   NewMonmentTimeline: 'new_monment_timeline', // 朋友圈更新

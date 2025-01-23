@@ -1,6 +1,5 @@
-import {post} from '@/request/request'
+import { post } from '@/request/request';
 
 export const downloadFile = (data, config) => {
-  return post('/message/downloadImage', data, config)
-}
-
+  return post('/message/downloadImage', data, config);
+};

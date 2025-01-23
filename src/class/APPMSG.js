@@ -4,10 +4,9 @@ export class AppMsg {
     if (!obj.appmsg) {
       throw new Error('appmsg 字段不能为空');
     }
-    if(typeof obj.appmsg !== 'string'){
+    if (typeof obj.appmsg !== 'string') {
       throw new Error('appmsg 字段必须为字符串');
     }
     this.appmsg = obj.appmsg;
   }
-
 }

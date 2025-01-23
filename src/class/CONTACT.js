@@ -1,6 +1,6 @@
-import {say} from '@/action/common'
-import {setRemark, find, findAll, contactSync} from '@/action/contact'
-import {ResponseMsg} from '@/class/MESSAGE.js'
+import { say } from '@/action/common';
+import { contactSync, find, findAll, setRemark } from '@/action/contact';
+import { ResponseMsg } from '@/class/MESSAGE.js';
 export class Contact {
   constructor(contactData) {
     this._name = contactData.nickName || 'no name';
@@ -14,14 +14,15 @@ export class Contact {
     this._city = contactData.city || null;
     this._avatarUrl = contactData.bigHeadImgUrl || contactData.smallHeadImgUrl || '';
     this._isSelf = false;
-    this.inviterUserName = contactData.inviterUserName || ''
+    this.inviterUserName = contactData.inviterUserName || '';
   }
 
   // 实例方法
 
-  async say (textOrContactOrFileOrUrl) { // 回复消息
-    const res = await say(textOrContactOrFileOrUrl, this._wxid)
-    return new ResponseMsg(res)
+  async say(textOrContactOrFileOrUrl) {
+    // 回复消息
+    const res = await say(textOrContactOrFileOrUrl, this._wxid);
+    return new ResponseMsg(res);
   }
 
   name() {
@@ -29,11 +30,10 @@ export class Contact {
   }
 
   async alias(newAlias) {
-    if(newAlias){
-      return await setRemark(this._wxid, newAlias)
-    }else{
-      return this._alias
+    if (newAlias) {
+      return await setRemark(this._wxid, newAlias);
     }
+    return this._alias;
   }
 
   friend() {
@@ -64,7 +64,7 @@ export class Contact {
 
   async sync() {
     // this._wxid
-    return await contactSync(this._wxid)
+    return await contactSync(this._wxid);
   }
 
   self() {
@@ -74,10 +74,10 @@ export class Contact {
   // 静态方法
 
   static async find(query) {
-    return find(query)
+    return find(query);
   }
 
   static async findAll(query) {
-    return findAll(query)
+    return findAll(query);
   }
 }

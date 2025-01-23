@@ -1,29 +1,29 @@
-import { XMLParser } from "fast-xml-parser";
-import { say, revoke, forward, quote } from '@/action/common.js';
-import { getContact, find } from '@/action/contact'
-import { getRoomInfo } from '@/action/room'
-import { toFileBox } from '@/action/file'
-import { Filebox } from '@/class/FILEBOX'
-import { MessageType } from '@/type/MessageType'
-
-
+import { forward, quote, revoke, say } from '@/action/common.js';
+import { find, getContact } from '@/action/contact';
+import { toFileBox } from '@/action/file';
+import { getRoomInfo } from '@/action/room';
+import { Filebox } from '@/class/FILEBOX';
+import { MessageType } from '@/type/MessageType';
+import { XMLParser } from 'fast-xml-parser';
 
 // 消息类
 export class Message {
   // 静态属性
-  static Type = MessageType
+  static Type = MessageType;
   // 实例属性
   constructor(data) {
     // 从 JSON 数据结构中提取所需信息
     this.wxid = data.Wxid;
 
-    if (data.Data.FromUserName.string.includes('@chatroom')) { // 新版本微信
+    if (data.Data.FromUserName.string.includes('@chatroom')) {
+      // 新版本微信
       this.isRoom = true;
       this.roomId = data.Data.FromUserName.string;
       this.fromId = data.Data.Content.string.split(':\n')[0];
       this.toId = this.roomId;
       this._text = data.Data.Content.string.split(':\n').slice(1).join(':\n') || '';
-    } else if (data.Data.ToUserName.string.includes('@chatroom')) { // 旧版本微信
+    } else if (data.Data.ToUserName.string.includes('@chatroom')) {
+      // 旧版本微信
       this.isRoom = true;
       this.roomId = data.Data.ToUserName.string;
       this.fromId = data.Data.FromUserName.string;
@@ -46,15 +46,17 @@ export class Message {
     this._status = data.Data.Status || null;
     this._msgSource = data.Data.MsgSource || null;
 
-    if (this.isRoom) { // 执行一次 自动插入房间数据
+    if (this.isRoom) {
+      // 执行一次 自动插入房间数据
       getRoomInfo(this.roomId);
     }
   }
 
   // 实例方法
-  isCompanyMsg() { // 是否是企业微信消息
-    const companyList = ['weixin', 'newsapp', 'tmessage', 'qqmail', 'mphelper', 'qqsafe', 'weibo', 'qmessage', 'floatbottle', 'medianote']
-    return this.fromId.includes('gh_') || companyList.includes(this.fromId)
+  isCompanyMsg() {
+    // 是否是企业微信消息
+    const companyList = ['weixin', 'newsapp', 'tmessage', 'qqmail', 'mphelper', 'qqsafe', 'weibo', 'qmessage', 'floatbottle', 'medianote'];
+    return this.fromId.includes('gh_') || companyList.includes(this.fromId);
   }
   //发送者
   from() {
@@ -82,12 +84,12 @@ export class Message {
   }
   // 发送消息
   async say(textOrContactOrFileOrUrl, ats) {
-    const res = await say(textOrContactOrFileOrUrl, this.isRoom ? this.roomId : this.fromId, ats)
-    return new ResponseMsg(res)
+    const res = await say(textOrContactOrFileOrUrl, this.isRoom ? this.roomId : this.fromId, ats);
+    return new ResponseMsg(res);
   }
   // 消息类型
   type() {
-    return Message.getType(this._type, this.text())
+    return Message.getType(this._type, this.text());
   }
   // 是否是自己发的消息
   self() {
@@ -96,7 +98,7 @@ export class Message {
   // 获取@的联系人 ..todo
   async mention() {
     // 根据消息内容模拟提到的联系人
-    console.log('暂不支持')
+    console.log('暂不支持');
     return null;
   }
   // 是否被@了
@@ -111,10 +113,10 @@ export class Message {
   // 消息转发
   async forward(to) {
     if (!to) {
-      console.error('转发消息时，接收者不能为空')
-      return
+      console.error('转发消息时，接收者不能为空');
+      return;
     }
-    return forward(this.text(), to, this.type())
+    return forward(this.text(), to, this.type());
   }
 
   date() {
@@ -132,7 +134,7 @@ export class Message {
   }
   // 获取链接。。。todo
   async toUrlLink() {
-    console.log('暂不支持')
+    console.log('暂不支持');
     return null;
   }
   // 获取图片。。。todo
@@ -141,43 +143,43 @@ export class Message {
       console.log('不是图片类型，无法调用toFileBox方法');
       return null;
     }
-    let xml = this._text
+    const xml = this._text;
 
     try {
       const url = await toFileBox(xml, type);
-      return Filebox.toDownload(url)
+      return Filebox.toDownload(url);
     } catch (e) {
-      console.error(e)
-      return null
+      console.error(e);
+      return null;
     }
   }
   // 引用消息
   async quote(title) {
     if (!title || title === '') {
-      console.error('引用消息时title不能为空')
-      return
+      console.error('引用消息时title不能为空');
+      return;
     }
 
     // 从 msgsource 中提取 signature
-    let signature = ''
+    let signature = '';
     if (this._msgSource) {
       const signatureMatch = this._msgSource.match(/<signature>(.*?)<\/signature>/);
-      if (signatureMatch && signatureMatch[1]) {
+      if (signatureMatch?.[1]) {
         signature = signatureMatch[1];
       }
     }
 
-    let msg = {
+    const msg = {
       title,
       msgid: this._newMsgId,
       wxid: this.fromId,
       roomid: this.roomId,
-      displayname: this.fromId === this.wxid ? '' : (this._pushContent.split('发送了一条消息')[0] || ''),
+      displayname: this.fromId === this.wxid ? '' : this._pushContent.split('发送了一条消息')[0] || '',
       content: this._text,
-      signature
-    }
+      signature,
+    };
 
-    return quote(msg)
+    return quote(msg);
   }
   // 获取xml转json
   static getXmlToJson(xml) {
@@ -185,21 +187,21 @@ export class Message {
       ignoreAttributes: false, // 不忽略属性
       attributeNamePrefix: '', // 移除默认的属性前缀
     });
-    let jObj = parser.parse(xml);
-    return jObj
+    const jObj = parser.parse(xml);
+    return jObj;
   }
   // 静态方法
   static async find(query) {
-    return await find(query)
+    return await find(query);
   }
 
   static async findAll(queryArgs) {
-    console.log('暂不支持findAll')
-    return Promise.resolve([])
+    console.log('暂不支持findAll');
+    return Promise.resolve([]);
   }
 
   static getType(type, xml) {
-    let jObj
+    let jObj;
     try {
       switch (type) {
         case 1:
@@ -217,33 +219,42 @@ export class Message {
         case 47:
           return MessageType.Emoji;
         case 48:
-          return MessageType.Location
+          return MessageType.Location;
         case 49:
           jObj = Message.getXmlToJson(xml);
           // console.log(jObj)
           if (jObj.msg.appmsg.type === 5) {
             if (jObj.msg.appmsg.title === '邀请你加入群聊') {
-              return MessageType.RoomInvitation
-            } else { // 公众号链接
-              return MessageType.Link;
+              return MessageType.RoomInvitation;
             }
-          } else if (jObj.msg.appmsg.type === 6) {
+            // 公众号链接
+            return MessageType.Link;
+          }
+          if (jObj.msg.appmsg.type === 6) {
             return MessageType.File;
-          } else if (jObj.msg.appmsg.type === 17) {
+          }
+          if (jObj.msg.appmsg.type === 17) {
             return MessageType.RealTimeLocation;
-          } else if (jObj.msg.appmsg.type === 19) {
+          }
+          if (jObj.msg.appmsg.type === 19) {
             return MessageType.ChatHistroy;
-          } else if (jObj.msg.appmsg.type === 33 || jObj.msg.appmsg.type === 36) {
+          }
+          if (jObj.msg.appmsg.type === 33 || jObj.msg.appmsg.type === 36) {
             return MessageType.MiniApp;
-          } else if (jObj.msg.appmsg.type === 51) {
+          }
+          if (jObj.msg.appmsg.type === 51) {
             return MessageType.VideoAccount;
-          } else if (jObj.msg.appmsg.type === 57) {
+          }
+          if (jObj.msg.appmsg.type === 57) {
             return MessageType.Quote;
-          } else if (jObj.msg.appmsg.type === 74) {
+          }
+          if (jObj.msg.appmsg.type === 74) {
             return MessageType.FileStart;
-          } else if (jObj.msg.appmsg.type === 2000) {
+          }
+          if (jObj.msg.appmsg.type === 2000) {
             return MessageType.Transfer;
-          } else if (jObj.msg.appmsg.type === 2001) {
+          }
+          if (jObj.msg.appmsg.type === 2001) {
             return MessageType.RedPacket;
           }
           break;
@@ -268,27 +279,31 @@ export class Message {
         case 10002:
           jObj = Message.getXmlToJson(xml);
           if (jObj.sysmsg.type === 'revokemsg') {
-            return MessageType.Revoke
-          } else if (jObj.sysmsg.type === 'pat') {
-            return MessageType.Pat
-          } else if (jObj.sysmsg.type === 'functionmsg') {
-            return MessageType.FunctionMsg
-          } else if (jObj.sysmsg.type === 'ilinkvoip') {
+            return MessageType.Revoke;
+          }
+          if (jObj.sysmsg.type === 'pat') {
+            return MessageType.Pat;
+          }
+          if (jObj.sysmsg.type === 'functionmsg') {
+            return MessageType.FunctionMsg;
+          }
+          if (jObj.sysmsg.type === 'ilinkvoip') {
             //voip邀请
-            return MessageType.Voip
-          } else if (jObj.sysmsg.type === 'trackmsg') {
+            return MessageType.Voip;
+          }
+          if (jObj.sysmsg.type === 'trackmsg') {
             //实时位置更新
           }
           break;
         default:
-          return MessageType.Unknown
+          return MessageType.Unknown;
       }
     } catch (e) {
-      return MessageType.Unknown
+      return MessageType.Unknown;
     }
   }
   static revoke(obj) {
-    return revoke(obj)
+    return revoke(obj);
   }
 }
 
@@ -297,7 +312,6 @@ export class ResponseMsg {
     Object.assign(this, obj);
   }
   revoke() {
-    return revoke(this)
+    return revoke(this);
   }
 }
-
