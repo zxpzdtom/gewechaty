@@ -222,6 +222,7 @@ export const quote = async (obj, toWxid) => {
       <chatusr>${obj.wxid}</chatusr>
       <displayname>${obj.displayname || ''}</displayname>
       <content>${obj.content || ''}</content>
+      ${obj.signature ? `<msgsource>&lt;msgsource&gt;&lt;signature&gt;${obj.signature}&lt;/signature&gt;&lt;/msgsource&gt;</msgsource>` : ''}
     </refermsg>
   </appmsg>`.replace(/>\s+</g, '><') // 移除多余的空白字符
   return SendAppMsg({

@@ -158,10 +158,23 @@ export class Message {
       return
     }
 
+    // 从 msgsource 中提取 signature
+    let signature = ''
+    if (this._msgSource) {
+      const signatureMatch = this._msgSource.match(/<signature>(.*?)<\/signature>/);
+      if (signatureMatch && signatureMatch[1]) {
+        signature = signatureMatch[1];
+      }
+    }
+
     let msg = {
       title,
       msgid: this._newMsgId,
-      wxid: this.fromId
+      wxid: this.fromId,
+      roomid: this.roomId,
+      displayname: this.fromId === this.wxid ? '' : (this._pushContent.split('发送了一条消息')[0] || ''),
+      content: this._text,
+      signature
     }
 
     return quote(msg, this.fromId)
